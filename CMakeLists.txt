@@ -36,4 +36,4 @@ link_directories(${CTP_LIB})
  
 set(SOURCES main.cpp CTPMarketDataSource.cpp)
 add_executable(${PROJECT_NAME} main.cpp CTPMarketDataSource.cpp)
-target_link_libraries(${PROJECT_NAME} thostmduserapi_se pthread)
+target_link_libraries(${PROJECT_NAME} ctpthostmduserapi pthread)

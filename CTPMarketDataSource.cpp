@@ -4,6 +4,9 @@ std::string BrokerID = "0";
 std::string InvestorID = "3620";
 std::string Password = "123456";
 
+char *ppInstrumentID[] = {(char*)"bu2302", (char*)"ag2304"};			// 行情订阅列表
+int iInstrumentID = 2;	
+
 CTPMarketDataSource::~CTPMarketDataSource(){}
 
 CTPMarketDataSource::CTPMarketDataSource(CThostFtdcMdApi *api) {
@@ -32,9 +35,6 @@ void CTPMarketDataSource::OnHeartBeatWarning(int nTimeLapse)
 {
     printf("beat\n");
 }
-
-char *ppInstrumentID[] = {"cu1710", "cu1801"};			// 行情订阅列表
-int iInstrumentID = 2;	
 
 void CTPMarketDataSource::OnRspUserLogin(
             CThostFtdcRspUserLoginField *pRspUserLogin,
@@ -80,11 +80,13 @@ void CTPMarketDataSource::OnRspSubMarketData(
             CThostFtdcRspInfoField *pRspInfo,
             int nRequestID, bool bIsLast)
 {
-    printf("rsp sub marketdata\n");
     bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
     if (!bResult)
     {
         // 订阅成功
+        printf("subscribe successful. instrumentID: %s\n", pSpecificInstrument->InstrumentID);
+    } else {
+        printf("subscribe failed. ErrID: %d, ErrInfo: %s\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
     }
 }
  
@@ -94,19 +96,29 @@ void CTPMarketDataSource::OnRspUnSubMarketData(
             int nRequestID, bool bIsLast)
 {
     bool bResult = pRspInfo && (pRspInfo->ErrorID != 0);
-    printf("instrusment id: %s, len: %d\n", pSpecificInstrument->InstrumentID, strlen(pSpecificInstrument->InstrumentID));
+    printf("instrusment id: %s, len: %d\n", pSpecificInstrument->InstrumentID, (int)strlen(pSpecificInstrument->InstrumentID));
     // printf("%s\n", pRspInfo->ErrorMsg);
     std::cout<<pRspInfo->ErrorMsg<<" "<<pRspInfo->ErrorID<<std::endl;
-    FILE *f = fopen("out.txt","w+");
-    fwrite(pRspInfo->ErrorMsg,1,20,f);
+    FILE *f = fopen("out.txt","a+");
+    if(f != nullptr) {
+        fwrite(pRspInfo->ErrorMsg,1,strlen(pRspInfo->ErrorMsg),f);
+        fclose(f);
+    }
+    
 }
  
  
- 
+int count = 0;
 void CTPMarketDataSource::OnRtnDepthMarketData(
                 CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-    printf("OnRtnDepthMarketData\n");
-    // 接收行情数据
-    // 处理订阅合约行情数据
+    printf("\n -------------------------- \n");
+    printf("count: %d\n", count++);
+    printf("TradingDay: %s\n", pDepthMarketData->ActionDay);
+    printf("InstrumentID: %s\n", pDepthMarketData->InstrumentID);
+    printf("ExchangeID: %s\n", pDepthMarketData->ExchangeID);
+    printf("ExchangeInstID: %s\n", pDepthMarketData->ExchangeInstID);
+    printf("LastPrice: %lf\n", pDepthMarketData->LastPrice);
+    printf("PreSettlementPrice: %lf\n", pDepthMarketData->PreSettlementPrice);
+    printf("PreClosePrice: %lf\n", pDepthMarketData->PreClosePrice);
 }

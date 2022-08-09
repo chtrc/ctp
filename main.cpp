@@ -4,7 +4,7 @@
 #include "CTPMarketDataSource.h"
 using namespace std;
 
-std::string MdFront = "tcp://122.51.136.165:20004";
+std::string MdFront = "tcp://180.169.112.54:42213";
 
 int main() {
     CThostFtdcMdApi *api = CThostFtdcMdApi::CreateFtdcMdApi();
